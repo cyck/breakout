@@ -7,5 +7,8 @@ export default defineConfig({
     compilerOptions: {
       dev: true
     }
-  })]
+  })],
+  build: {
+    outDir: 'build'
+  }
 })

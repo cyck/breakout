@@ -4,7 +4,7 @@
   import Heart from "svelte-icons/fa/FaHeart.svelte";
 
   enum Playground {
-    CEILING = 550,
+    CEILING = 600,
     FLOOR = 0,
     LEFT = 0,
     RIGHT = 1000,
@@ -102,11 +102,13 @@
     brick.destroyed = true;
   };
 
-  const movePaddle: svelte.JSX.MouseEventHandler<HTMLElement> = (e) => {
-    const canMoveLeft = e.clientX >= Playground.LEFT + paddle.size.width / 2;
-    const canMoveRight = e.clientX <= Playground.RIGHT - paddle.size.width / 2;
+  const movePaddle: svelte.JSX.UIEventHandler<HTMLElement> = (e) => {
+    // @ts-ignore Non-standard property
+    const mouseX = e.layerX;
+    const canMoveLeft = mouseX >= Playground.LEFT + paddle.size.width / 2;
+    const canMoveRight = mouseX <= Playground.RIGHT - paddle.size.width / 2;
     if (canMoveLeft && canMoveRight) {
-      paddle.x = e.offsetX - paddle.size.width / 2;
+      paddle.x = mouseX - paddle.size.width / 2;
     }
   };
 
@@ -251,13 +253,23 @@
 
   onMount(() => {
     if (game.gameOver) return;
+    if (!game.active) return;
 
     startGame();
+    setTimeout(() => {
+      clearInterval(engine);
+    }, 0)
   });
 </script>
 
 {#if !game.gameOver}
-  <main on:mousemove|self={movePaddle}>
+  <main 
+    style="
+      width: {Playground.RIGHT}px;
+      height: {Playground.CEILING}px;
+    "
+    on:mousemove={movePaddle}
+  >
     <div class="statistics">
       <div class="lives-counter">
         {#each Array(game.lives) as _, i}
@@ -312,8 +324,6 @@
 
 <style>
   main {
-    width: 1000px;
-    height: 600px;
     margin: 100px auto 0 auto;
     position: relative;
     overflow: hidden;
