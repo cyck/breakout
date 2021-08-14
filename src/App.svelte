@@ -38,7 +38,7 @@
     lives: 3,
     score: 0,
     fps: 60,
-    active: false,
+    active: true,
     gameOver: false,
   };
 
@@ -84,7 +84,7 @@
       return {
         id: `brick-${nanoid()}`,
         x: el.offsetLeft,
-        y: Playground.CEILING - el.offsetTop + el.clientHeight,
+        y: Playground.CEILING - el.offsetTop - el.clientHeight,
         size: {
           height: el.clientHeight,
           width: el.clientWidth,
@@ -185,7 +185,7 @@
   const bounceBrick: Bounce = ([up, right], brick: Brick) => {
     if (brick.destroyed) return [up, right];
     if (!isCollision(brick)) return [up, right];
-
+    
     destroyBrick(brick);
     game.score++;
     return [-up, right];
@@ -256,9 +256,6 @@
     if (!game.active) return;
 
     startGame();
-    setTimeout(() => {
-      clearInterval(engine);
-    }, 0)
   });
 </script>
 
@@ -311,7 +308,12 @@
     />
   </main>
 {:else}
-  <main>
+  <main
+    style="
+      width: {Playground.RIGHT}px;
+      height: {Playground.CEILING}px;
+    "
+  >
     <div class="game-over">
       <h1>Game Over</h1>
       <h6>Level: {game.level}</h6>
